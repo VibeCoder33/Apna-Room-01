@@ -1,26 +1,44 @@
-import express from "express";
+import { Express } from "express";
+import { Server } from "http";
+import { WebSocketServer } from "ws";
 import cors from "cors";
-import { requireAuth } from "./middleware/clerkAuth"; // or adjust path if needed
+import { storage } from "./storage";
+import { requireAuth } from "./middleware/clerkAuth";
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+export async function registerRoutes(app: Express, server: Server) {
+  app.use(cors());
 
-app.use(cors());
-app.use(express.json());
+  app.get("/api/ping", (_req, res) => {
+    res.send("pong");
+  });
 
-// 🔐 Protected route
-app.get("/api/protected", requireAuth, (req, res) => {
-  res.json({ message: "You are authenticated!" });
-});
+  app.get("/api/protected", requireAuth, (req, res) => {
+    res.json({ message: "You are authenticated!" });
+  });
 
-// 🟢 Public route (no auth)
-app.get("/", (req, res) => {
-  res.send("API is running");
-});
+  app.get("/", (req, res) => {
+    res.send("API is live");
+  });
 
-app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
-});
+  app.get("/api/listings", async (req, res) => {
+    const listings = await storage.getListings({});
+    res.json(listings);
+  });
+
+  const wss = new WebSocketServer({ server, path: "/ws" });
+
+  wss.on("connection", (ws) => {
+    console.log("WebSocket connected");
+
+    ws.on("message", (data) => {
+      wss.clients.forEach((client) => {
+        if (client.readyState === ws.OPEN) {
+          client.send(data.toString());
+        }
+      });
+    });
+  });
+}
 
 // import type { Express } from "express";
 // import { createServer, type Server } from "http";

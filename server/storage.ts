@@ -23,10 +23,13 @@ export interface IStorage {
   // User operations (mandatory for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
-  
+
   // Listing operations
   createListing(listing: InsertListing & { ownerId: string }): Promise<Listing>;
-  updateListing(id: number, updates: Partial<InsertListing>): Promise<Listing | undefined>;
+  updateListing(
+    id: number,
+    updates: Partial<InsertListing>
+  ): Promise<Listing | undefined>;
   deleteListing(id: number, ownerId: string): Promise<boolean>;
   getListing(id: number): Promise<Listing | undefined>;
   getListings(filters?: {
@@ -37,20 +40,27 @@ export interface IStorage {
     roomType?: string;
     ownerId?: string;
   }): Promise<Listing[]>;
-  
+
   // Application operations
-  createApplication(application: InsertApplication & { seekerId: string }): Promise<Application>;
-  updateApplicationStatus(id: number, status: "PENDING" | "ACCEPTED" | "REJECTED"): Promise<Application | undefined>;
+  createApplication(
+    application: InsertApplication & { seekerId: string }
+  ): Promise<Application>;
+  updateApplicationStatus(
+    id: number,
+    status: "PENDING" | "ACCEPTED" | "REJECTED"
+  ): Promise<Application | undefined>;
   getApplication(id: number): Promise<Application | undefined>;
   getApplicationsForListing(listingId: number): Promise<Application[]>;
   getApplicationsForSeeker(seekerId: string): Promise<Application[]>;
   getApplicationsForOwner(ownerId: string): Promise<Application[]>;
-  
+
   // Message operations
-  createMessage(message: InsertMessage & { senderId: string }): Promise<Message>;
+  createMessage(
+    message: InsertMessage & { senderId: string }
+  ): Promise<Message>;
   getMessages(chatId: string): Promise<Message[]>;
   getChatId(userId1: string, userId2: string): string;
-  
+
   // Review operations
   createReview(review: InsertReview & { authorId: string }): Promise<Review>;
   getReviewsForUser(userId: string): Promise<Review[]>;
@@ -86,15 +96,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Listing operations
-  async createListing(listing: InsertListing & { ownerId: string }): Promise<Listing> {
-    const [newListing] = await db
-      .insert(listings)
-      .values(listing)
-      .returning();
+  async createListing(
+    listing: InsertListing & { ownerId: string }
+  ): Promise<Listing> {
+    const [newListing] = await db.insert(listings).values(listing).returning();
     return newListing;
   }
 
-  async updateListing(id: number, updates: Partial<InsertListing>): Promise<Listing | undefined> {
+  async updateListing(
+    id: number,
+    updates: Partial<InsertListing>
+  ): Promise<Listing | undefined> {
     const [updated] = await db
       .update(listings)
       .set({ ...updates, updatedAt: new Date() })
@@ -111,7 +123,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getListing(id: number): Promise<Listing | undefined> {
-    const [listing] = await db.select().from(listings).where(eq(listings.id, id));
+    const [listing] = await db
+      .select()
+      .from(listings)
+      .where(eq(listings.id, id));
     return listing;
   }
 
@@ -124,9 +139,9 @@ export class DatabaseStorage implements IStorage {
     ownerId?: string;
   }): Promise<Listing[]> {
     let query = db.select().from(listings);
-    
+
     const conditions = [];
-    
+
     if (filters?.search) {
       conditions.push(
         or(
@@ -136,38 +151,40 @@ export class DatabaseStorage implements IStorage {
         )
       );
     }
-    
+
     if (filters?.minRent) {
       conditions.push(gte(listings.rent, filters.minRent));
     }
-    
+
     if (filters?.maxRent) {
       conditions.push(lte(listings.rent, filters.maxRent));
     }
-    
+
     if (filters?.location) {
       conditions.push(ilike(listings.location, `%${filters.location}%`));
     }
-    
+
     if (filters?.roomType) {
       conditions.push(eq(listings.roomType, filters.roomType));
     }
-    
+
     if (filters?.ownerId) {
       conditions.push(eq(listings.ownerId, filters.ownerId));
     } else {
       conditions.push(eq(listings.available, true));
     }
-    
+
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
     }
-    
+
     return await query.orderBy(desc(listings.createdAt));
   }
 
   // Application operations
-  async createApplication(application: InsertApplication & { seekerId: string }): Promise<Application> {
+  async createApplication(
+    application: InsertApplication & { seekerId: string }
+  ): Promise<Application> {
     const [newApplication] = await db
       .insert(applications)
       .values(application)
@@ -175,7 +192,10 @@ export class DatabaseStorage implements IStorage {
     return newApplication;
   }
 
-  async updateApplicationStatus(id: number, status: "PENDING" | "ACCEPTED" | "REJECTED"): Promise<Application | undefined> {
+  async updateApplicationStatus(
+    id: number,
+    status: "PENDING" | "ACCEPTED" | "REJECTED"
+  ): Promise<Application | undefined> {
     const [updated] = await db
       .update(applications)
       .set({ status })
@@ -185,7 +205,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getApplication(id: number): Promise<Application | undefined> {
-    const [application] = await db.select().from(applications).where(eq(applications.id, id));
+    const [application] = await db
+      .select()
+      .from(applications)
+      .where(eq(applications.id, id));
     return application;
   }
 
@@ -222,11 +245,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Message operations
-  async createMessage(message: InsertMessage & { senderId: string }): Promise<Message> {
-    const [newMessage] = await db
-      .insert(messages)
-      .values(message)
-      .returning();
+  async createMessage(
+    message: InsertMessage & { senderId: string }
+  ): Promise<Message> {
+    const [newMessage] = await db.insert(messages).values(message).returning();
     return newMessage;
   }
 
@@ -245,11 +267,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Review operations
-  async createReview(review: InsertReview & { authorId: string }): Promise<Review> {
-    const [newReview] = await db
-      .insert(reviews)
-      .values(review)
-      .returning();
+  async createReview(
+    review: InsertReview & { authorId: string }
+  ): Promise<Review> {
+    const [newReview] = await db.insert(reviews).values(review).returning();
     return newReview;
   }
 

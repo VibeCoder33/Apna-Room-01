@@ -11,6 +11,7 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.35.3",
     "@clerk/clerk-sdk-node": "^4.13.23",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
@@ -101,9 +102,10 @@
     "@vitejs/plugin-react": "^4.3.2",
     "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.30.4",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.25.8",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.17",
+    "ts-node-dev": "^2.0.0",
     "tsx": "^4.19.1",
     "typescript": "5.6.3",
     "vite": "^5.4.19"

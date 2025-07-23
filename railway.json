@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "backend": {
+      "source": "server",
+      "start": "npm run start"
+    },
+    "frontend": {
+      "source": "client",
+      "start": "npm run dev"
+    }
+  }
+}

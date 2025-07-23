@@ -1,0 +1,23 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx index.ts",
+    "start": "node dist/index.js",
+    "build": "esbuild index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "drizzle-orm": "^0.44.3",
+    "express": "^4.21.2",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.8",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
+  }
+}
